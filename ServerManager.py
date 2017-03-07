@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 '''
-@author: ‘wang_pc‘
-@site: 
-@software: PyCharm
+@author: alishtory
+@site: https://github.com/alishtory
 @file: ServerManager.py
 @time: 2017/3/7 15:28
 @description: 多用户版本中，启动、关闭、更新流量的管理模块
