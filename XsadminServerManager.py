@@ -66,5 +66,5 @@ if __name__ == '__main__':
             logging.error('loop happens error:')
             import traceback
             traceback.print_exc()
-            raise e
+            os.exit(0)
         time.sleep(config.API_INTERVAL)
