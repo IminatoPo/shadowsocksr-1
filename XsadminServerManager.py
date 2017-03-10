@@ -63,8 +63,7 @@ if __name__ == '__main__':
         try:
             manager.loop_server()
         except Exception as e:
-            logging.error('loop happens error:')
+            logging.error('loop happens error')
             import traceback
             traceback.print_exc()
-            os.exit(0)
         time.sleep(config.API_INTERVAL)
