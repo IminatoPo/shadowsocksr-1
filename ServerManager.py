@@ -21,7 +21,7 @@ class AbstractServerManager():
     last_transfer_stamps = {} #上次流量更新到的戳、标记
 
     @abstractmethod
-    def update_transfer_fench_users(self, curr_transfers):
+    def update_transfer_fetch_users(self, curr_transfers):
      '''
      抽象方法，子类必须实现
      1. 更新流量的回调
@@ -65,7 +65,8 @@ class AbstractServerManager():
             #2. 本次流量到达点减去戳点，得到上次到本次之间，这个端口使用的流量
             curr_transfers[port] = (trans[0]-last_trans_stamp[0], trans[1]-last_trans_stamp[1])
 
-        user_cfgs = self.update_transfer_fench_users(curr_transfers)
+        logging.debug('curr_transfers is: %s' % curr_transfers)
+        user_cfgs = self.update_transfer_fetch_users(curr_transfers)
         enable_port_set = set(user_cfgs.keys())
 
         #更新流量成功之后，我们把流量戳改一下@@@@
