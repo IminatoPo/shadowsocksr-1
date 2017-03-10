@@ -57,13 +57,10 @@ def test():
     print post_api_request(json=data).json()
 
 if __name__ == '__main__':
+    manager = XsadminServerManager()
     while(True):
-        manager = XsadminServerManager()
-
         try:
             manager.loop_server()
         except Exception as e:
-            logging.error('loop happens error')
-            import traceback
-            traceback.print_exc()
+            logging.error('loop happens error:%s'% e.message)
         time.sleep(config.API_INTERVAL)
