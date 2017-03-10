@@ -59,10 +59,12 @@ def test():
 if __name__ == '__main__':
     while(True):
         manager = XsadminServerManager()
+
         try:
             manager.loop_server()
         except Exception as e:
             logging.error('loop happens error:')
             import traceback
             traceback.print_exc()
+            raise e
         time.sleep(config.API_INTERVAL)
