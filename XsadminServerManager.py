@@ -24,6 +24,7 @@ class XsadminServerManager(AbstractServerManager):
         else:
             #不是200，出错了
             logging.info('api request code is%d\n%s'%(response.status_code, response.text))
+            raise Exception('api return error')
 
 
 
@@ -49,12 +50,14 @@ def get_nonce_str():
 
 
 def test():
+    '''
     data = {
         12121: [12812, 290371],
         17241: [628132, 52490371],
         12129: [18122, 372901]
     }
-    print post_api_request(json=data).json()
+    logging.info(post_api_request(json=data).json())
+    '''
 
 if __name__ == '__main__':
     manager = XsadminServerManager()
