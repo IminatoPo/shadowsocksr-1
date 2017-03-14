@@ -3,19 +3,18 @@
 '''
 @author: alishtory
 @site: https://github.com/alishtory
-@file: XsadminServerManager.py
+@file: xsadmin_server.py
 @time: 2017/3/10 16:33
 @description: 
 '''
 
-import XsadminConfig as config
+import config_xsadmin as config
 import requests, hashlib
 import time, random, logging
 
 
 from ServerManager import AbstractServerManager
 class XsadminServerManager(AbstractServerManager):
-
     def update_transfer_fetch_users(self, curr_transfers):
         response = post_api_request(json=curr_transfers)
         if response.status_code == 200:
@@ -25,8 +24,6 @@ class XsadminServerManager(AbstractServerManager):
             #不是200，出错了
             logging.info('api request code is%d\n%s'%(response.status_code, response.text))
             raise Exception('api return error')
-
-
 
 def post_api_request(data= None,json= None):
     headers = {'content-type': 'application/json'}
@@ -43,21 +40,8 @@ def signature_header():
     signature = m.hexdigest()
     return '%s|%s|%s|%d'%(config.API_KEY, nonce_str, signature, timestamp)
 
-
-
 def get_nonce_str():
     return ''.join(random.sample('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',10))
-
-
-def test():
-    '''
-    data = {
-        12121: [12812, 290371],
-        17241: [628132, 52490371],
-        12129: [18122, 372901]
-    }
-    logging.info(post_api_request(json=data).json())
-    '''
 
 if __name__ == '__main__':
     manager = XsadminServerManager()

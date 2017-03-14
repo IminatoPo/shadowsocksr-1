@@ -1,105 +1,113 @@
-ShadowsocksR
-===========
+XsAdmin ShadowsocksR端部署教程
+=========================
+本ss服务端支持多用户流量控制、支持SSR新特性，需配合[xsadmin](https://github.com/alishtory/xsadmin)面板项目Restfull接口使用
 
-[![Build Status]][Travis CI]
-
-A fast tunnel proxy that helps you bypass firewalls.
-
-Server
-------
-
-### Install
-
-Debian / Ubuntu:
-
-    apt-get install git
-    git clone https://github.com/shadowsocksr/shadowsocksr.git
-
+# 1. 安装相关依赖
+## 1.1 安装Requests/Git等
 CentOS:
+```
+yum install -y git python-setuptools && easy_install pip
+```
+ubuntu/debian：
+```
+apt-get install -y python-pip git
+```
 
-    yum install git
-    git clone https://github.com/shadowsocksr/shadowsocksr.git
+## 1.2 安装libsodium
 
-Windows:
+如果要使用 salsa20 或 chacha20 或 chacha20-ietf 算法，请安装 [libsodium](https://github.com/jedisct1/libsodium) :
 
-    git clone https://github.com/shadowsocksr/shadowsocksr.git
+centos：
 
-### Usage for single user on linux platform
+```
+yum install -y epel-release libsodium
+```
+如果想自己编译，那么可以用以下的命令
+```
+yum -y groupinstall "Development Tools"
+wget https://github.com/jedisct1/libsodium/releases/download/1.0.10/libsodium-1.0.10.tar.gz
+tar xf libsodium-1.0.10.tar.gz && cd libsodium-1.0.10
+./configure && make -j2 && make install
+echo /usr/local/lib > /etc/ld.so.conf.d/usr_local_lib.conf
+ldconfig
+```
 
-If you clone it into "~/shadowsocksr"  
-move to "~/shadowsocksr", then run:
+ubuntu/debian：
 
-    bash initcfg.sh
+```
+apt-get install -y build-essential
+wget https://github.com/jedisct1/libsodium/releases/download/1.0.10/libsodium-1.0.10.tar.gz
+tar xf libsodium-1.0.10.tar.gz && cd libsodium-1.0.10
+./configure && make -j2 && make install
+ldconfig
+```
 
-move to "~/shadowsocksr/shadowsocks", then run:
+如果曾经安装过旧版本，亦可重复用以上步骤更新到最新版，仅1.0.4或以上版本支持chacha20-ietf
 
-    python server.py -p 443 -k password -m aes-128-cfb -O auth_aes128_md5 -o tls1.2_ticket_auth_compatible
+## 1.3 安装Supervisor
+安装supervisor很简单，通过easy_install就可以安装
+```
+yum -y install python-setuptools
+easy_install supervisor
+```
+安装完成之后，就可以用`echo_supervisord_conf`命令来生成配置文件
+```
+echo_supervisord_conf > /etc/supervisord.conf
+```
+supervisor开机脚本
+```
+wget https://github.com/Supervisor/initscripts/raw/master/redhat-init-mingalevme
+mv redhat-init-mingalevme /etc/init.d/supervisord
+chmod +x /etc/init.d/supervisord
+chkconfig supervisord on  #开机自启动
+service supervisord restart  #启动
+```
 
-Check all the options via `-h`.
+# 2. 获取项目源码
+```
+git clone -b manyuser https://github.com/alishtory/shadowsocksr.git
+```
+执行完毕后此目录会新建一个shadowsocksr目录，其中根目录的（./shadowsocksr）是多用户版
 
-You can also use a configuration file instead (recommend), move to "~/shadowsocksr" and edit the file "user-config.json", then move to "~/shadowsocksr/shadowsocks" again, just run:
+进入根目录初始化配置(假设根目录在~/shadowsocksr，如果不是，命令需要适当调整)：
+```
+cd ~/shadowsocksr
+```
 
-    python server.py
+# 3. 配置客户端
+## 3.1 配置API
+进入xsadmin项目管理员后台，添加节点，然后点击进入编辑节点页面，右上角有一个[API配置信息](:void(0))，点击进入API配置信息页面
 
-To run in the background:
+复制`user-config.json`配置内容，并在`~/shadowsocksr`文件夹下建立并保存成`user-config.json`文件
 
-    ./logrun.sh
+同理，复制`config_xsadmin.py`配置内容，并在`~/shadowsocksr`文件夹下建立并保存成`config_xsadmin.py`文件
 
-To stop:
-
-    ./stop.sh
-
-To monitor the log:
-
-    ./tail.sh
-
-
-Client
-------
-
-* [Windows] / [macOS]
-* [Android] / [iOS]
-* [OpenWRT]
-
-Use GUI clients on your local PC/phones. Check the README of your client
-for more information.
-
-Documentation
--------------
-
-You can find all the documentation in the [Wiki].
-
-License
--------
-
-Copyright 2015 clowwindy
-
-Licensed under the Apache License, Version 2.0 (the "License"); you may
-not use this file except in compliance with the License. You may obtain
-a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-License for the specific language governing permissions and limitations
-under the License.
-
-Bugs and Issues
-----------------
-
-* [Issue Tracker]
+## 3.2 配置supervisor进程管理
+执行以下命令：
+```
+cat<< EOF >> /etc/supervisor.conf
+[program:ssserver]
+command = python /root/shadowsocksr/xsadmin_server.py
+directory = /root/shadowsocksr
+user = root
+autostart = true
+autorestart = true
+redirect_stderr=true
+stdout_logfile = /root/shadowsocksr/ssserver.log
+EOF
+```
+重启supervisor：
+```
+service supervisord restart
+```
+查看ss的运行log：
+```
+supervisorctl tail -f ssserver
+```
+重启ssserver
+```
+supervisorctl restart ssserver
+```
 
 
 
-[Android]:           https://github.com/shadowsocksr/shadowsocksr-android
-[Build Status]:      https://travis-ci.org/shadowsocksr/shadowsocksr.svg?branch=manyuser
-[Debian sid]:        https://packages.debian.org/unstable/python/shadowsocks
-[iOS]:               https://github.com/shadowsocks/shadowsocks-iOS/wiki/Help
-[Issue Tracker]:     https://github.com/shadowsocksr/shadowsocksr/issues?state=open
-[OpenWRT]:           https://github.com/shadowsocks/openwrt-shadowsocks
-[macOS]:             https://github.com/shadowsocksr/ShadowsocksX-NG
-[Travis CI]:         https://travis-ci.org/shadowsocksr/shadowsocksr
-[Windows]:           https://github.com/shadowsocksr/shadowsocksr-csharp
-[Wiki]:              https://github.com/breakwa11/shadowsocks-rss/wiki
