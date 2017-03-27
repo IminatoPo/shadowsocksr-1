@@ -63,6 +63,11 @@ chkconfig supervisord on  #开机自启动
 service supervisord restart  #启动
 ```
 
+## 1.4 安装依赖
+```
+pip install requests
+```
+
 # 2. 获取项目源码
 ```
 git clone -b manyuser https://github.com/alishtory/shadowsocksr.git
@@ -85,7 +90,7 @@ cd ~/shadowsocksr
 ## 3.2 配置supervisor进程管理
 执行以下命令：
 ```
-cat<< EOF >> /etc/supervisor.conf
+cat<< EOF >> /etc/supervisord.conf
 [program:ssserver]
 command = python /root/shadowsocksr/xsadmin_server.py
 directory = /root/shadowsocksr
