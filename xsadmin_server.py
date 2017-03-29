@@ -13,9 +13,6 @@ import requests, hashlib
 import time, random, logging
 from ServerManager import AbstractServerManager
 
-logging.getLogger("requests").setLevel(logging.ERROR)
-logging.getLogger("urllib3").setLevel(logging.ERROR)
-
 
 class XsadminServerManager(AbstractServerManager):
     def update_transfer_fetch_users(self, curr_transfers):
