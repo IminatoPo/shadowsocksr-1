@@ -38,7 +38,7 @@ class AbstractServerManager():
      pass
 
     def load_user_cfgs(self, user_cfg):
-        default_cfgs = self.spool.config
+        default_cfgs = self.spool.config.copy()  # copy bug
         default_cfgs.update(user_cfg)
         return default_cfgs
 
