@@ -25,10 +25,10 @@ class XsadminServerManager(AbstractServerManager):
             logging.info('api request code is%d\n%s'%(response.status_code, response.text))
             raise Exception('api return error')
 
-def post_api_request(data= None,json= None):
+def post_api_request(data= None,json= None,verify=False):
     headers = {'content-type': 'application/json'}
     headers['AUTHORIZATION']= signature_header()
-    r = requests.post(config.API_URL, data=data, json=json, headers=headers)
+    r = requests.post(config.API_URL, data=data, json=json, headers=headers,verify=verify)
     return r
 
 def signature_header():
